@@ -2,35 +2,35 @@ const BUCKET_SIZE: usize = 4;
 
 type BucketVector = Vec<Option<u8>>;
 
+#[derive(Debug)]
 pub struct Bucket {
     bucket: BucketVector,
 }
-#[derive(Copy,Debug)]
-impl Bucket {
 
+impl Bucket {
     pub fn new() -> Bucket {
         Bucket {
-            bucket: vec![None; BUCKET_SIZE]
+            bucket: vec![None; BUCKET_SIZE],
         }
     }
 
-    pub fn insert(&mut self, value: u8 ) -> bool {
+    pub fn insert(&mut self, value: u8) -> bool {
         match self.get_empty_entry() {
             Ok(index) => {
                 self.bucket[index] = Some(value);
                 true
             }
-            Err(err) => false
+            Err(err) => false,
         }
     }
 
-    pub fn delete(&mut self, value: u8 ) -> bool {
-        match self.index_of(u8) {
+    pub fn delete(&mut self, value: u8) -> bool {
+        match self.index_of(Some(value)) {
             Some(index) => {
                 self.bucket[index] = None;
                 true
             }
-            None => false
+            None => false,
         }
     }
 
