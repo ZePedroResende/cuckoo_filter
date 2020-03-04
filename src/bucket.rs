@@ -1,16 +1,14 @@
-const BUCKET_SIZE: usize = 4;
-
 type BucketVector = Vec<Option<u8>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Bucket {
-    bucket: BucketVector,
+    pub bucket: BucketVector,
 }
 
 impl Bucket {
-    pub fn new() -> Bucket {
+    pub fn new(capacity: usize) -> Bucket {
         Bucket {
-            bucket: vec![None; BUCKET_SIZE],
+            bucket: vec![None; capacity],
         }
     }
 
@@ -20,7 +18,7 @@ impl Bucket {
                 self.bucket[index] = Some(value);
                 true
             }
-            Err(err) => false,
+            Err(_) => false,
         }
     }
 
