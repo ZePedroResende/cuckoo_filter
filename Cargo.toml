@@ -3,8 +3,16 @@ name = "cuckoo_filter"
 version = "0.1.0"
 authors = ["ZePedroResende <j.p.resende68@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "a cuckoo filter implementation in rust"
+repository = "https://github.com/ZePedroResende/cuckoo_filter"
+readme = "README.md"
+keywords = ["cuckoo", "filter", "bloom","cuckoo filter"]
+categories = ["caching", "compression","data-structures"]
+license = "MIT"
+license-file = "LICENSE.md"
+codecov = { repository = "https://github.com/ZePedroResende/cuckoo_filter", branch = "master", service = "github" }
+coveralls = { repository = "https://github.com/ZePedroResende/cuckoo_filter", branch = "master", service = "github" }
+maintenance = { status = "passively-maintained" }
 
 [dependencies]
 rand = "0.6"
