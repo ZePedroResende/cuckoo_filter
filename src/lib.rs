@@ -24,7 +24,7 @@ impl CuckooFilter {
         CuckooFilter {
             buckets: buckets,
             bucket_size: 8,
-            num_buckets: 4 << 20,
+            num_buckets: 100,
             filled: 0,
         }
     }
@@ -33,6 +33,7 @@ impl CuckooFilter {
         let value = m.into();
         let (mut fingerprint, index, alt_index) = fingerprint_i1_i2(value, self.num_buckets);
 
+        self.buckets.get_mut(index);
         if self.buckets[index].insert(fingerprint) || self.buckets[alt_index].insert(fingerprint) {
             self.filled += 1;
             return true;
@@ -78,7 +79,7 @@ impl CuckooFilter {
         let (fingerprint, index, alt_index) = fingerprint_i1_i2(value, self.num_buckets);
 
         if self.buckets[index].delete(fingerprint) || self.buckets[alt_index].delete(fingerprint) {
-            self.filled += 1;
+            self.filled -= 1;
             return true;
         }
 
@@ -89,8 +90,8 @@ impl CuckooFilter {
 fn alt_index(fingerprint: u8, index: usize, num_bucket: usize) -> usize {
     let mut hasher = DefaultHasher::new();
     fingerprint.hash(&mut hasher);
-    let hash = hasher.finish() as usize % num_bucket;
-    (index % num_bucket) ^ hash
+    let hash = hasher.finish() as usize;
+    ((index) ^ hash) % num_bucket
 }
 
 fn fingerprint_i1_i2(value: Vec<u8>, num_bucket: usize) -> (u8, usize, usize) {
@@ -105,4 +106,42 @@ fn fingerprint_i1_i2(value: Vec<u8>, num_bucket: usize) -> (u8, usize, usize) {
     let index1 = hash as usize % num_bucket;
     let alt_index = alt_index(fingerprint, index1, num_bucket);
     (fingerprint, index1, alt_index)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_insert() -> Result<(), String> {
+        let x = "ola";
+        let mut bucket = CuckooFilter::new(4);
+        bucket.insert(x);
+        assert_eq!(bucket.contains(x), true);
+        assert_eq!(bucket.filled, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_contains() -> Result<(), String> {
+        let x = "ola";
+        let mut bucket = CuckooFilter::new(4);
+        bucket.insert(x);
+        assert_eq!(bucket.contains(x), true);
+        assert_eq!(bucket.contains("not_ola"), false);
+        assert_eq!(bucket.filled, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_remove() -> Result<(), String> {
+        let x = "ola";
+        let mut bucket = CuckooFilter::new(4);
+        bucket.insert(x);
+        bucket.remove(x);
+        assert_eq!(bucket.contains(x), false);
+        assert_eq!(bucket.contains("not_ola"), false);
+        assert_eq!(bucket.filled, 0);
+        Ok(())
+    }
 }
